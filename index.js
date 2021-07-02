@@ -8,6 +8,9 @@ client.curency = require('./curency.json');
 client.homework = require('./homework.json');
 
 const Embeds = require('./embeds');
+
+
+
 const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
 var cmdmap = {
@@ -519,7 +522,7 @@ function checkInTime() {
 			hoursLeft -= 24;
 		}
 
-		 channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
+		 //channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
 
 		if (daysLeft == 0) {
 			lastChance(channel, i);
@@ -620,13 +623,14 @@ client.on('ready', () => {
 	//var autoCheck = setInterval(checkInTime(), 15000);
 
 	client.user.setActivity('auf !help', { type: 'LISTENING' });
-
+/*
 	var interval =
 		setInterval(function() {
 			checkInTime();
 		}, 1000 * 60) *
 		60 *
 		4;
+*/
 
 	//
 	//  Checks if  Homework on next day
@@ -674,3 +678,4 @@ client.on('message', msg => {
 });
 
 client.login(config.token);
+

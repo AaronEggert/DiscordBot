@@ -776,6 +776,13 @@ var data  = fs.readFileSync('./homework.json'),
 
 })
 
+
+client.on('guildMemberAdd', member => {
+    var role = member.guild.roles.cache.find(role => role.name == "Klasse")
+    member.roles.add(role);
+});
+
+
 client.on('message', msg => {
     var cont    = msg.content,
         author  = msg.member,

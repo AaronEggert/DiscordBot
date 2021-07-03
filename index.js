@@ -1,3 +1,4 @@
+
 let Discord   = require("discord.js");
 const fs      = require('fs');
 const cron    = require('node-cron');
@@ -630,7 +631,7 @@ function cmd_ping (msg, args, author) {
 
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`)
+  console.log(`Logged in as ${client.user.tag}!  ${Date()}`)
 
   var admin_channel = client.channels.cache.get('859782495361171466');
   admin_channel.send("Bot started succesfull! :white_check_mark:")

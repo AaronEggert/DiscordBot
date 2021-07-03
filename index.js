@@ -634,26 +634,104 @@ function cmd_ping (msg, args, author) {
 
 
 function cmd_ignore (msg, args, author) {
-  	if (args[0].toLowerCase() === "channel") {
-      if (args[1].toLowerCase() === "add") {
-        channel = parseInt(args[2]);
+  	if (args[0] === "channel") {
+      if (args[1] === "add") {
 
-        if (msg.guild.channels.exists("id", channel)) {
-          msg.reply(":white_check_mark:");
+        var channel = args[2].slice(2, -1);
+
+        var data  = fs.readFileSync('./ignore.json'),
+          json	= JSON.parse(data),
+          channels = json.channels;
+
+          msg.channel.send(channels);
+
+        if (msg.guild.channels.cache.find(c => c.id === channel)) {
+          if (channels.includes(channel) ) {
+            msg.channel.send({embed: {
+              color: 0xE74C3C,
+              description: "Dieser Kanal wird bereits ignoriert"
+            }});
+            return;
+          }
+          else {
+            channels.push(channel);
+            
+            fs.writeFileSync('./ignore.json', JSON.stringify(json, null, 2));
+
+            msg.channel.send({embed: {
+              color: 0x2ECC71,
+              description: `Der Kanal wurde erfolgreich hinzugefügt. \n <#${channel}> wird ab sofort vom Bot ignoriert.`
+            }});
+            return;
+          }
+        }
+      }
+
+      if (args[1] === "remove") {
+        var data      = fs.readFileSync('./ignore.json'),
+            json	    = JSON.parse(data),
+            channels  = json.channels,
+            channel   = args [2].slice(2, -1);
+
+
+        if (channels.includes(channel)) {
+          
+        var filter = channels.filter(function (el) {
+          return el != channel;
+        });
+        json.channels = filter;
+        fs.writeFileSync('./ignore.json', JSON.stringify(json, null, 2));
+        msg.channel.send({embed: {
+          color: 0x2ECC71,
+          description: `Erfolgreich gelöscht. \n Der Bot verarbeitet jetzt wieder Befehle aus <#${channel}>.`
+        }});
+          return;
         }
         else {
-
-          msg.reply(":x:");
+          msg.channel.send({embed: {
+            color: 0xE74C3C,
+            description: "Der Kanal wird zurzeit nicht vom Bot ignoriert."
+          }});
+          return;
         }
 
-
-
       }
+
+      if (args[1] === "list") {
+        var data      = fs.readFileSync('./ignore.json'),
+            json	    = JSON.parse(data),
+            channels  = json.channels,
+            channel_list = [];
+
+        for (let i = 0; channels.length > i; i++) {
+          channel_list.push(`<#${channels[i]}>`);
+        }
+
+        if (channel_list.length > 0) {
+          msg.channel.send({embed: {
+            color: 0xE67E22,
+            title: "Folgende Kanäle werden vom Bot ignoriert:",
+            description: `${channel_list}.`
+          }})
+        }
+        else {
+          msg.channel.send("Es werden zurzeit keine Kanäle ignoriert.");
+          return;
+        }
+
+        return;
+      }
+
+      msg.channel.send({embed: {
+        color: 0xE74C3C,
+        description: `Ungültiger befehl: >${args[1]}< `
+      }});
+
     }
     else {
       msg.channel.send({embed: {
         color: 0xE74C3C,
-        value: ":x: Error"
+        description: ":x: Error"
       }});
       return;
     }
@@ -704,8 +782,15 @@ client.on('message', msg => {
         chan    = msg.channel,
         guild   = msg.guild
 
-    if (author.id != client.user.id && cont.startsWith(config.prefix)) {
 
+    var data  = fs.readFileSync('./ignore.json'),
+    json	    = JSON.parse(data),
+    channels  = json.channels;
+    
+
+
+    if (author.id != client.user.id && cont.startsWith(config.prefix) && !channels.includes(msg.channel.id) ) {
+      
       var invoke  = cont.split(' ')[0].substr(config.prefix.length),
           args    = cont.split(' ').slice(1)
 

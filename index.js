@@ -505,8 +505,7 @@ function checkInTime () {
     json	= JSON.parse(data),
     hw    = json.HW;
     
-  var channel = client.channels.cache.get('859735266948677672');
-    channel.bulkDelete(100, true);
+
   for (let i = 0; i < hw.length; i++) {
     var item =  hw[i];
     var aTime   = new Date(item.Abgabe),
@@ -528,6 +527,8 @@ function checkInTime () {
 
       // channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
+        channel.bulkDelete(100, true);
+
         if (daysLeft == 0 && hoursLeft <= 0) {
           var data  = fs.readFileSync('./homework.json'),
           json	= JSON.parse(data),
@@ -581,7 +582,7 @@ var color;
     
   }
 
-  channel.bulkDelete(100, true);
+
   channel.send({ embed: {
     color: color,
     
@@ -641,16 +642,7 @@ client.on('ready', () => {
     type: "STREAMING"
   });
   */
-  //var autoCheck = setInterval(checkInTime(), 15000);
-
   client.user.setActivity("auf !help", {type: "LISTENING"});
-
-  /*
-    var interval = setInterval (function () {
-      checkInTime();
-    }, 1000 * 60) * 60 * 4; 
-*/
-
 
 //
 //  Checks if  Homework on next day

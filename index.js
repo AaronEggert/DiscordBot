@@ -23,7 +23,8 @@ const config  = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
     homework: cmd_homework, 
     hw: cmd_homework,
     clear: cmd_clear,
-    ping: cmd_ping
+    ping: cmd_ping,
+    ignore: cmd_ignore
 
   }
 
@@ -628,6 +629,35 @@ function cmd_clear (msg, args, author) {
 function cmd_ping (msg, args, author) {
   msg.channel.send(`${Date.now() - msg.createdTimestamp}ms`)
 }
+
+
+
+function cmd_ignore (msg, args, author) {
+  	if (args[0].toLowerCase() === "channel") {
+      if (args[1].toLowerCase() === "add") {
+        channel = parseInt(args[2]);
+
+        if (msg.guild.channels.exists("id", channel)) {
+          msg.reply(":white_check_mark:");
+        }
+        else {
+
+          msg.reply(":x:");
+        }
+
+
+
+      }
+    }
+    else {
+      msg.channel.send({embed: {
+        color: 0xE74C3C,
+        value: ":x: Error"
+      }});
+      return;
+    }
+}
+
 
 
 client.on('ready', () => {

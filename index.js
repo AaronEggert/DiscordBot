@@ -11,6 +11,8 @@ client.homework = require("./homework.json");
 const Embeds  = require('./embeds');
 const config  = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
+var msgId;
+
 
   var cmdmap = {
     help: cmd_help,
@@ -745,6 +747,11 @@ client.on('ready', () => {
   var admin_channel = client.channels.cache.get('859782495361171466');
   admin_channel.send("Bot started succesfull! :white_check_mark:")
 
+  send_rules();
+  send_botUpdates();
+
+
+
 /*  
   client.user.setActivity("Debug mode", {
     type: "STREAMING"
@@ -808,6 +815,80 @@ client.on('message', msg => {
       }      
 
     }
+     if (msg.mentions.has(client.user)) {
+       msg.reply(`Der Bot prefix ist: \`${config.prefix}\`. `);
+   }
 });
+
+client.on('messageReactionRemove', (reaction, user) => {
+  var channel = client.channels.cache.get('859735266948677672');
+   if(user.id !== client.user.id) {
+        if (reaction.message.id === msgId) {
+          if (reaction.emoji.name === "🇭") {
+            let role = reaction.message.guild.roles.cache.get("859848403563577345");          
+            let member = reaction.message.guild.members.cache.get(user.id);
+            
+            member.roles.remove(role);
+            return;
+          }
+        }
+    }
+});
+
+
+client.on('messageReactionAdd', (reaction, user) => {
+ var channel = client.channels.cache.get('859735266948677672');
+   if(user.id !== client.user.id) {
+        if (reaction.message.id === msgId) {
+          if (reaction.emoji.name === "🇭") {
+            let role = reaction.message.guild.roles.cache.get("859848403563577345");          
+            let member = reaction.message.guild.members.cache.get(user.id);
+            
+            member.roles.add(role);
+            return;
+          }
+        }
+    }
+});
+
+function send_rules() {
+channel = client.channels.cache.get(config.regeln_channel);
+channel.bulkDelete(100, true);
+
+  
+  channel.send({embed: {
+    color: 0x550,
+    title: "Regeln:",
+    description: "Hier sind die Regeln:"
+  }})
+
+  channel.send({embed: {
+    color: 0x3498DB,
+    title: "Werde ein Helfer!",
+    description: "<@&859848403563577345>",
+    fields: [
+      {
+        name: "Was machen Helfer?",
+        value: ` \`\`\`- Helfer können Hausaufgaben hinzufügen \n- Sie können bei Hausafgaben helfen  \`\`\``
+      },
+      {
+        name: "Wie werde ich Helfer?",
+        value: "Reagiere einfach auf dieser nachricht mit dem 🇭 emoji. \n Klicke dazu einfach unten auf das 🇭 unter dieser Nachricht."
+      }
+    ]
+  }})
+  .then(function (message) {
+          message.react("🇭");
+          msgId = message.id;
+    		});
+
+
+}
+
+function send_botUpdates() {
+  channel = client.channels.cache.get(config.bot_channel);
+}
+
+
 
 client.login(config.token);

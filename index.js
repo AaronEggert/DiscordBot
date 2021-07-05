@@ -506,7 +506,8 @@ function cmd_homework (msg, args, author) {
 function checkInTime () {
   var data  = fs.readFileSync('./homework.json'),
     json	= JSON.parse(data),
-    hw    = json.HW;
+    hw    = json.HW,
+    channel = client.channels.cache.get('859735266948677672');
     
     channel.bulkDelete(100, true);
 

@@ -1,3 +1,16 @@
 {
-    "HW": []
+ "HW": [
+  {
+   "Fach": "deutsch",
+   "Abgabe": "2021-08-20T13:50:00.000Z",
+   "Aufgabe": "Deustch",
+   "Ersteller": "<Aaron>"
+  },
+  {
+   "Fach": "mathe",
+   "Abgabe": "2021-07-06T08:00:00.000Z",
+   "Aufgabe": "Löse die Aufgaben auf Seite 199.",
+   "Ersteller": "<Aaron>"
+  }
+ ]
 }

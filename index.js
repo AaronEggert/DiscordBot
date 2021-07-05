@@ -426,8 +426,63 @@ function cmd_homework (msg, args, author) {
 
           description: `Autorisiert`,
           }});
-        var num = parseInt(args[1]);
-        if (num <= hw.length && num >= 0) {
+
+
+         
+
+          if (args[1] === "all") {
+            console.log(hw.length);
+            
+            msg.channel.send( {embed: {
+              color: 0xF1C40F,
+    
+              description: `Bist du dir sicher das du *alle* löchen willst? \n Wenn ja dann anrworte mit "ja"`,
+              }});
+        
+            const filter = (newMessage) => {
+              return newMessage.author.id === msg.author.id
+            }
+            const collector = new Discord.MessageCollector(msg.channel, filter, {
+              max: 1,
+              time: 1000 * 30
+            });
+        
+            collector.on('end', async (collected) => {
+              const isShure = collected.first()
+        
+              if (!isShure){
+                msg.reply("Du hast nicht inerhalb der Zeit geantwortet!")
+                return
+              }
+            
+              shure = isShure.toString().toLowerCase();
+              
+              if (shure === "ja"){
+                
+                for (let i = 0; i < hw.length; i++) {
+                  delete hw[i];
+                }
+                var filter = hw.filter(function (el) {
+                  return el != null;
+                });
+                json.HW = filter;
+                
+                fs.writeFileSync('./homework.json', JSON.stringify(json, null, 4));
+
+                msg.channel.send({embed: {
+                    color: 0x2ECC71,
+                    description: `Alle Hausaufgaben wurden erfolgreich gelöscht!`
+                }});
+              }
+              })
+          }
+
+          
+          
+          else {
+
+            var num = parseInt(args[1]);
+            if (num <= hw.length && num >= 0) {
             msg.channel.send("Ok");
 
             msg.channel.send( {embed: {
@@ -482,15 +537,16 @@ function cmd_homework (msg, args, author) {
 
             });
 
-        }
-        else {
-          msg.channel.send( {embed: {
+            }
+            else {
+             msg.channel.send( {embed: {
             color: 0xE74C3C,
   
             description: "Error!",
             }});
         }
       }
+    }
       else {
         msg.channel.send({embed: {
           color: 0xE74C3C,
@@ -499,7 +555,6 @@ function cmd_homework (msg, args, author) {
         return;
       }
     } 
-    
 }
 
 
@@ -670,7 +725,7 @@ function cmd_ignore (msg, args, author) {
           }
         }
       }
-
+      
       if (args[1] === "remove") {
         var data      = fs.readFileSync('./ignore.json'),
             json	    = JSON.parse(data),

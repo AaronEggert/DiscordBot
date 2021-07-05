@@ -508,7 +508,6 @@ function checkInTime () {
     json	= JSON.parse(data),
     hw    = json.HW,
     channel = client.channels.cache.get('859735266948677672');
-    
     channel.bulkDelete(100, true);
 
   for (let i = 0; i < hw.length; i++) {
@@ -530,7 +529,7 @@ function checkInTime () {
           hoursLeft -= 24;
         }
 
-      // channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
+      //channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
         
 

@@ -508,6 +508,7 @@ function checkInTime () {
     json	= JSON.parse(data),
     hw    = json.HW;
     
+    channel.bulkDelete(100, true);
 
   for (let i = 0; i < hw.length; i++) {
     var item =  hw[i];
@@ -530,7 +531,7 @@ function checkInTime () {
 
       // channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
-        channel.bulkDelete(100, true);
+        
 
         if (daysLeft == 0 && hoursLeft <= 0) {
           var data  = fs.readFileSync('./homework.json'),

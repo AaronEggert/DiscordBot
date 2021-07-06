@@ -301,20 +301,21 @@ function cmd_homework (msg, args, author) {
             test.push({"Name": "Aaron"});
             fs.writeFileSync('./test.json', JSON.stringify(json, null, 4));
             */
+           var date =  new Date(time[0], (time[1]), time[2], time[3], time[4])
+            date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), (date.getHours() - 2), date.getMinutes(), date.getSeconds()));
 
-            
             var data  = fs.readFileSync('./homework.json'),
                 json  = JSON.parse(data),
                 hw    = json.HW;
             hw.push({
                 "Fach": fach,
-                "Abgabe": new Date(time[0], (time[1] - 1), time[2], time[3], time[4], ),
+                "Abgabe": date,
                 "Aufgabe": Aufgabe,
                 "Ersteller": msg.author.username
             });
             fs.writeFileSync('./homework.json', JSON.stringify(json, null, 4));
             msg.channel.send("Write!");
-
+            convertTZ("2012/04/20 10:10:30 +0000", "Asia/Jakarta")
             /*
             var hausaufgaben = client.homework ["Config"].Hausaufgaben;
             
@@ -380,9 +381,21 @@ function cmd_homework (msg, args, author) {
           break;
         
       }
-    
-    
-      msg.channel.send({ embed: {
+
+
+
+    var date = new Date(item.Abgabe);
+
+    function convertTZ(date, tzString) {
+      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+  }
+  
+
+  var aa = convertTZ(`${date.getFullYear()}/${date.getMonth()}/${(date.getDay() + 1)} ${date.getHours()}:${date.getMinutes()}:00 +0000`, "Europe/Berlin") // Tue Apr 20 2012 17:10:30 GMT+0700 (Western Indonesia Time)
+
+
+
+    msg.channel.send({ embed: {
         color: color,
         
         title: `Aufgabe ${i}`,
@@ -397,24 +410,25 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: new Date(item.Abgabe),
+            value: aa,
           }
         ],
-        timestamp: new Date(item.Abgabe),
+        timestamp: new Date(aa),
         footer: {
           text: ""
         }
       }
     });
-  
+    }
 
     // Embeds.hwList(client, color, msg.channel, `\`Fach:\` \n  ${item.Fach} \n` + '`Aufgabe:`' + `\n ${item.Aufgabe} \n \`Abgabe:\` ${item.Abgabe} \n \n \`Hinzugefügt von:\` ${item.Ersteller}`, `Hausaufgabe: ${i}`, "");
   }
-}
+
 
   if (args[0] === "in-time") {
     checkInTime();
      }
+
      var data  = fs.readFileSync('./homework.json'),
      json	= JSON.parse(data),
      hw    = json.HW;
@@ -425,7 +439,8 @@ function cmd_homework (msg, args, author) {
           color: 0x2ECC71,
 
           description: `Autorisiert`,
-          }});
+      }
+    });
 
 
          
@@ -554,7 +569,8 @@ function cmd_homework (msg, args, author) {
         }})
         return;
       }
-    } 
+    }
+  
 }
 
 

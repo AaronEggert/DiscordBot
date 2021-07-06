@@ -947,13 +947,36 @@ function send_botUpdates() {
 
 
 client.on('voiceStateUpdate', (oldMember, newMember) => {
-  var temporary = [];
-  const mainCatagory = '858436736555810888';
-  const mainChannel = '860847697736892436';
- 
   var data  = fs.readFileSync('./channels.json'),
   json	= JSON.parse(data),
   channels    = json.channels;
+  
+  var filter = channels.filter(function (el) {
+    return el != null;
+  });
+  channels = filter;
+      
+  if(channels.length >= 0) for(let i = 0; i < channels.length; i++) {
+    // Finding...
+    var ch = client.channels.cache.get(channels[i]);
+    if(ch.members.size <= 0){
+      ch.delete()
+      // Channel has been deleted!
+      delete channels[i];
+      var filter = channels.filter(function (el) {
+        return el != null;
+      });
+      channels = filter;
+      json.channels = channels;
+      fs.writeFileSync('./channels.json', JSON.stringify(json, null, 2));
+    
+    }
+  }
+
+
+  const mainCatagory = '858436736555810888';
+  const mainChannel = '860847697736892436';
+ 
 
      if(newMember.channelID == mainChannel){
         // Create channel...
@@ -961,34 +984,18 @@ client.on('voiceStateUpdate', (oldMember, newMember) => {
         var user = client.users.cache.find(user => user.id === newMember.member.id)
          server.channels.create(`${user.username}'s channel`, {type: 'voice', parent: mainCatagory})
              .then(async channel => {
-                 channels.push(channel.id)
-
+                 channels.push(channel.id);
+                 json.channels = channels;
                  fs.writeFileSync('./channels.json', JSON.stringify(json, null, 2));
-                 // A new element has been added to temporary array!
+
                  newMember.member.voice.setChannel(channel);
-             })
-     }
-
-     
-   
-     
- 
-
-     if(channels.length >= 0) for(let i = 0; i < channels.length; i++) {
-         // Finding...
-         let ch = client.channels.cache.get(channels[i]);
-         // Channel Found! 
-         console.log(i); 
-         if(ch.members.size <= 0){
-            console.log("delete");
-             ch.delete()
-             // Channel has been deleted!
-             delete channels[i];
-         }
-     }
-
-    fs.writeFileSync('./channels.json', JSON.stringify(json, null, 2));
-  })
+                 
+                });
+                
+              }             
+                            
+                
+              })
 
 
 

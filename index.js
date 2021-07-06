@@ -677,10 +677,10 @@ var color;
       },
       {
         name: "Abgabe:",
-        value: new Date(item.Abgabe),
+        value: `${item.Abgabe.getDate()}.${(item.Abgabe.getMonth() + 1)}.${item.Abgabe.getFullYear()} ${(item.Abgabe.getHours() + 2)}:${item.Abgabe.getMinutes()}`,
       }
     ],
-    timestamp: new Date(item.Abgabe),
+    timestamp: "s",
     footer: {
       text: "Automatische Warnnachricht"
     }

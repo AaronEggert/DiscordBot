@@ -410,7 +410,7 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: `${aa.getDate()}.${aa.getMonth()}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
+            value: `${aa.getDate()}.${(aa.getMonth() + 1)}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
           }
         ],
         timestamp: "",
@@ -590,6 +590,10 @@ function checkInTime () {
     oneHour = 1000 * 60 * 60,
     hoursLeft;
     
+
+
+    var date = new Date(item.Abgabe);
+
         var daysLeft = 0;
 
         hoursLeft = dif / oneHour;

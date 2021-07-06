@@ -410,7 +410,7 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: `${aa.getDay()}.${aa.getMonth()}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
+            value: `${aa.getDate()}.${aa.getMonth()}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
           }
         ],
         timestamp: "",

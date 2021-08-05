@@ -301,12 +301,10 @@ function cmd_homework (msg, args, author) {
             test.push({"Name": "Aaron"});
             fs.writeFileSync('./test.json', JSON.stringify(json, null, 4));
             */
-           var date =  new Date(time[0], (time[1]), time[2], time[3], time[4])
-            date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), (date.getHours() - 2), date.getMinutes(), date.getSeconds()));
-
-            var data  = fs.readFileSync('./homework.json'),
-                json  = JSON.parse(data),
-                hw    = json.HW;
+           var date =  new Date(time[0], time[1], time[2], time[3], time[4]),
+               data  = fs.readFileSync('./homework.json'),
+               json  = JSON.parse(data),
+               hw    = json.HW;
             hw.push({
                 "Fach": fach,
                 "Abgabe": date,
@@ -385,15 +383,7 @@ function cmd_homework (msg, args, author) {
 
 
     var date = new Date(item.Abgabe);
-
-    function convertTZ(date, tzString) {
-      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
-  }
   
-
-  var aa = convertTZ(`${date.getFullYear()}/${date.getMonth()}/${(date.getDay() + 1)} ${date.getHours()}:${date.getMinutes()}:00 +0000`, "Europe/Berlin") // Tue Apr 20 2012 17:10:30 GMT+0700 (Western Indonesia Time)
-
-
 
     msg.channel.send({ embed: {
         color: color,
@@ -410,7 +400,7 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: `${aa.getDate()}.${(aa.getMonth() + 1)}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
+            value: `${date.getDate()}.${(date.getMonth())}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
           }
         ],
         timestamp: "",

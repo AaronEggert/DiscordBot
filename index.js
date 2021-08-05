@@ -383,29 +383,29 @@ function cmd_homework (msg, args, author) {
 
 
     var date = new Date(item.Abgabe);
+    date     = new Date(date.getFullYear(), (date.getMonth() - 1), date.getDate(), date.getHours(), date.getMinutes());
   
-
     msg.channel.send({ embed: {
         color: color,
         
-        title: `Aufgabe ${i}`,
+        title: ``,
         description: "",
         fields: [{
             name: "Aufgabe:",
             value: item.Aufgabe,
           },
           {
-            name: "Fach: ",
+            name: "Fach:",
             value: item.Fach,
           },
           {
             name: "Abgabe:",
-            value: `${date.getDate()}.${(date.getMonth())}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
+            value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()}`,
           }
         ],
-        timestamp: "",
+        timestamp: new Date(),
         footer: {
-          text: ""
+          text: "@AaronBot"
         }
       }
     });
@@ -713,7 +713,7 @@ function GetDayOfWeek(x)
     case 6:
       return "Samstag";
 
-    case 7:
+    case 7, 0:
       return "Sonntag";
   }
 }
@@ -871,7 +871,7 @@ client.on('ready', () => {
 //
 
 /// Every 4 hours
-cron.schedule('00 0-23/4 * * *', function() {
+cron.schedule('00 */5 * * *', function() {
   checkInTime();
 });
 

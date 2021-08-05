@@ -11,6 +11,8 @@ client.homework = require("./homework.json");
 const Embeds  = require('./embeds');
 const config  = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
+var msgId;
+
 
   var cmdmap = {
     help: cmd_help,
@@ -23,7 +25,8 @@ const config  = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
     homework: cmd_homework, 
     hw: cmd_homework,
     clear: cmd_clear,
-    ping: cmd_ping
+    ping: cmd_ping,
+    ignore: cmd_ignore
 
   }
 
@@ -298,20 +301,21 @@ function cmd_homework (msg, args, author) {
             test.push({"Name": "Aaron"});
             fs.writeFileSync('./test.json', JSON.stringify(json, null, 4));
             */
+           var date =  new Date(time[0], (time[1]), time[2], time[3], time[4])
+            date = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), (date.getHours() - 2), date.getMinutes(), date.getSeconds()));
 
-            
             var data  = fs.readFileSync('./homework.json'),
                 json  = JSON.parse(data),
                 hw    = json.HW;
             hw.push({
                 "Fach": fach,
-                "Abgabe": new Date(time[0], (time[1] - 1), time[2], time[3], time[4], ),
+                "Abgabe": date,
                 "Aufgabe": Aufgabe,
                 "Ersteller": msg.author.username
             });
             fs.writeFileSync('./homework.json', JSON.stringify(json, null, 4));
             msg.channel.send("Write!");
-
+            convertTZ("2012/04/20 10:10:30 +0000", "Asia/Jakarta")
             /*
             var hausaufgaben = client.homework ["Config"].Hausaufgaben;
             
@@ -377,9 +381,21 @@ function cmd_homework (msg, args, author) {
           break;
         
       }
-    
-    
-      msg.channel.send({ embed: {
+
+
+
+    var date = new Date(item.Abgabe);
+
+    function convertTZ(date, tzString) {
+      return new Date((typeof date === "string" ? new Date(date) : date).toLocaleString("en-US", {timeZone: tzString}));   
+  }
+  
+
+  var aa = convertTZ(`${date.getFullYear()}/${date.getMonth()}/${(date.getDay() + 1)} ${date.getHours()}:${date.getMinutes()}:00 +0000`, "Europe/Berlin") // Tue Apr 20 2012 17:10:30 GMT+0700 (Western Indonesia Time)
+
+
+
+    msg.channel.send({ embed: {
         color: color,
         
         title: `Aufgabe ${i}`,
@@ -394,24 +410,25 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: new Date(item.Abgabe),
+            value: `${aa.getDate()}.${(aa.getMonth() + 1)}.${aa.getFullYear()} ${aa.getHours()}:${aa.getMinutes()}`,
           }
         ],
-        timestamp: new Date(item.Abgabe),
+        timestamp: "",
         footer: {
           text: ""
         }
       }
     });
-  
+    }
 
     // Embeds.hwList(client, color, msg.channel, `\`Fach:\` \n  ${item.Fach} \n` + '`Aufgabe:`' + `\n ${item.Aufgabe} \n \`Abgabe:\` ${item.Abgabe} \n \n \`Hinzugefügt von:\` ${item.Ersteller}`, `Hausaufgabe: ${i}`, "");
   }
-}
+
 
   if (args[0] === "in-time") {
     checkInTime();
      }
+
      var data  = fs.readFileSync('./homework.json'),
      json	= JSON.parse(data),
      hw    = json.HW;
@@ -422,9 +439,65 @@ function cmd_homework (msg, args, author) {
           color: 0x2ECC71,
 
           description: `Autorisiert`,
-          }});
-        var num = parseInt(args[1]);
-        if (num <= hw.length && num >= 0) {
+      }
+    });
+
+
+         
+
+          if (args[1] === "all") {
+            console.log(hw.length);
+            
+            msg.channel.send( {embed: {
+              color: 0xF1C40F,
+    
+              description: `Bist du dir sicher das du *alle* löchen willst? \n Wenn ja dann anrworte mit "ja"`,
+              }});
+        
+            const filter = (newMessage) => {
+              return newMessage.author.id === msg.author.id
+            }
+            const collector = new Discord.MessageCollector(msg.channel, filter, {
+              max: 1,
+              time: 1000 * 30
+            });
+        
+            collector.on('end', async (collected) => {
+              const isShure = collected.first()
+        
+              if (!isShure){
+                msg.reply("Du hast nicht inerhalb der Zeit geantwortet!")
+                return
+              }
+            
+              shure = isShure.toString().toLowerCase();
+              
+              if (shure === "ja"){
+                
+                for (let i = 0; i < hw.length; i++) {
+                  delete hw[i];
+                }
+                var filter = hw.filter(function (el) {
+                  return el != null;
+                });
+                json.HW = filter;
+                
+                fs.writeFileSync('./homework.json', JSON.stringify(json, null, 4));
+
+                msg.channel.send({embed: {
+                    color: 0x2ECC71,
+                    description: `Alle Hausaufgaben wurden erfolgreich gelöscht!`
+                }});
+              }
+              })
+          }
+
+          
+          
+          else {
+
+            var num = parseInt(args[1]);
+            if (num <= hw.length && num >= 0) {
             msg.channel.send("Ok");
 
             msg.channel.send( {embed: {
@@ -479,15 +552,16 @@ function cmd_homework (msg, args, author) {
 
             });
 
-        }
-        else {
-          msg.channel.send( {embed: {
+            }
+            else {
+             msg.channel.send( {embed: {
             color: 0xE74C3C,
   
             description: "Error!",
             }});
         }
       }
+    }
       else {
         msg.channel.send({embed: {
           color: 0xE74C3C,
@@ -495,18 +569,18 @@ function cmd_homework (msg, args, author) {
         }})
         return;
       }
-    } 
-    
+    }
+  
 }
 
 
 function checkInTime () {
   var data  = fs.readFileSync('./homework.json'),
     json	= JSON.parse(data),
-    hw    = json.HW;
-    
-  var channel = client.channels.cache.get('859735266948677672');
+    hw    = json.HW,
+    channel = client.channels.cache.get('859735266948677672');
     channel.bulkDelete(100, true);
+
   for (let i = 0; i < hw.length; i++) {
     var item =  hw[i];
     var aTime   = new Date(item.Abgabe),
@@ -516,6 +590,10 @@ function checkInTime () {
     oneHour = 1000 * 60 * 60,
     hoursLeft;
     
+
+
+    var date = new Date(item.Abgabe);
+
         var daysLeft = 0;
 
         hoursLeft = dif / oneHour;
@@ -526,8 +604,10 @@ function checkInTime () {
           hoursLeft -= 24;
         }
 
-      // channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
+      //channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
+        
+
         if (daysLeft == 0 && hoursLeft <= 0) {
           var data  = fs.readFileSync('./homework.json'),
           json	= JSON.parse(data),
@@ -581,7 +661,7 @@ var color;
     
   }
 
-  channel.bulkDelete(100, true);
+
   channel.send({ embed: {
     color: color,
     
@@ -597,10 +677,10 @@ var color;
       },
       {
         name: "Abgabe:",
-        value: new Date(item.Abgabe),
+        value: `${item.Abgabe.getDate()}.${(item.Abgabe.getMonth() + 1)}.${item.Abgabe.getFullYear()} ${(item.Abgabe.getHours() + 2)}:${item.Abgabe.getMinutes()}`,
       }
     ],
-    timestamp: new Date(item.Abgabe),
+    timestamp: "s",
     footer: {
       text: "Automatische Warnnachricht"
     }
@@ -630,27 +710,130 @@ function cmd_ping (msg, args, author) {
 }
 
 
+
+function cmd_ignore (msg, args, author) {
+  	if (args[0] === "channel") {
+      if (args[1] === "add") {
+
+        var channel = args[2].slice(2, -1);
+
+        var data  = fs.readFileSync('./ignore.json'),
+          json	= JSON.parse(data),
+          channels = json.channels;
+
+          msg.channel.send(channels);
+
+        if (msg.guild.channels.cache.find(c => c.id === channel)) {
+          if (channels.includes(channel) ) {
+            msg.channel.send({embed: {
+              color: 0xE74C3C,
+              description: "Dieser Kanal wird bereits ignoriert"
+            }});
+            return;
+          }
+          else {
+            channels.push(channel);
+            
+            fs.writeFileSync('./ignore.json', JSON.stringify(json, null, 2));
+
+            msg.channel.send({embed: {
+              color: 0x2ECC71,
+              description: `Der Kanal wurde erfolgreich hinzugefügt. \n <#${channel}> wird ab sofort vom Bot ignoriert.`
+            }});
+            return;
+          }
+        }
+      }
+      
+      if (args[1] === "remove") {
+        var data      = fs.readFileSync('./ignore.json'),
+            json	    = JSON.parse(data),
+            channels  = json.channels,
+            channel   = args [2].slice(2, -1);
+
+
+        if (channels.includes(channel)) {
+          
+        var filter = channels.filter(function (el) {
+          return el != channel;
+        });
+        json.channels = filter;
+        fs.writeFileSync('./ignore.json', JSON.stringify(json, null, 2));
+        msg.channel.send({embed: {
+          color: 0x2ECC71,
+          description: `Erfolgreich gelöscht. \n Der Bot verarbeitet jetzt wieder Befehle aus <#${channel}>.`
+        }});
+          return;
+        }
+        else {
+          msg.channel.send({embed: {
+            color: 0xE74C3C,
+            description: "Der Kanal wird zurzeit nicht vom Bot ignoriert."
+          }});
+          return;
+        }
+
+      }
+
+      if (args[1] === "list") {
+        var data      = fs.readFileSync('./ignore.json'),
+            json	    = JSON.parse(data),
+            channels  = json.channels,
+            channel_list = [];
+
+        for (let i = 0; channels.length > i; i++) {
+          channel_list.push(`<#${channels[i]}>`);
+        }
+
+        if (channel_list.length > 0) {
+          msg.channel.send({embed: {
+            color: 0xE67E22,
+            title: "Folgende Kanäle werden vom Bot ignoriert:",
+            description: `${channel_list}.`
+          }})
+        }
+        else {
+          msg.channel.send("Es werden zurzeit keine Kanäle ignoriert.");
+          return;
+        }
+
+        return;
+      }
+
+      msg.channel.send({embed: {
+        color: 0xE74C3C,
+        description: `Ungültiger befehl: >${args[1]}< `
+      }});
+
+    }
+    else {
+      msg.channel.send({embed: {
+        color: 0xE74C3C,
+        description: ":x: Error"
+      }});
+      return;
+    }
+}
+
+
+
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!  ${Date()}`)
 
   var admin_channel = client.channels.cache.get('859782495361171466');
   admin_channel.send("Bot started succesfull! :white_check_mark:")
 
+  send_rules();
+  send_botUpdates();
+
+
+
 /*  
   client.user.setActivity("Debug mode", {
     type: "STREAMING"
   });
   */
-  //var autoCheck = setInterval(checkInTime(), 15000);
-
   client.user.setActivity("auf !help", {type: "LISTENING"});
-
-  /*
-    var interval = setInterval (function () {
-      checkInTime();
-    }, 1000 * 60) * 60 * 4; 
-*/
-
 
 //
 //  Checks if  Homework on next day
@@ -676,14 +859,28 @@ var data  = fs.readFileSync('./homework.json'),
 
 })
 
+
+client.on('guildMemberAdd', member => {
+    var role = member.guild.roles.cache.find(role => role.name == "Klasse")
+    member.roles.add(role);
+});
+
+
 client.on('message', msg => {
     var cont    = msg.content,
         author  = msg.member,
         chan    = msg.channel,
         guild   = msg.guild
 
-    if (author.id != client.user.id && cont.startsWith(config.prefix)) {
 
+    var data  = fs.readFileSync('./ignore.json'),
+    json	    = JSON.parse(data),
+    channels  = json.channels;
+    
+
+
+    if (author.id != client.user.id && cont.startsWith(config.prefix) && !channels.includes(msg.channel.id) ) {
+      
       var invoke  = cont.split(' ')[0].substr(config.prefix.length),
           args    = cont.split(' ').slice(1)
 
@@ -694,6 +891,133 @@ client.on('message', msg => {
       }      
 
     }
+     if (msg.mentions.has(client.user)) {
+       msg.reply(`Der Bot prefix ist: \`${config.prefix}\`. `);
+   }
 });
+
+client.on('messageReactionRemove', (reaction, user) => {
+  var channel = client.channels.cache.get('859735266948677672');
+   if(user.id !== client.user.id) {
+        if (reaction.message.id === msgId) {
+          if (reaction.emoji.name === "🇭") {
+            let role = reaction.message.guild.roles.cache.get("859848403563577345");          
+            let member = reaction.message.guild.members.cache.get(user.id);
+            
+            member.roles.remove(role);
+            return;
+          }
+        }
+    }
+});
+
+
+client.on('messageReactionAdd', (reaction, user) => {
+ var channel = client.channels.cache.get('859735266948677672');
+   if(user.id !== client.user.id) {
+        if (reaction.message.id === msgId) {
+          if (reaction.emoji.name === "🇭") {
+            let role = reaction.message.guild.roles.cache.get("859848403563577345");          
+            let member = reaction.message.guild.members.cache.get(user.id);
+            
+            member.roles.add(role);
+            return;
+          }
+        }
+    }
+});
+
+function send_rules() {
+channel = client.channels.cache.get(config.regeln_channel);
+channel.bulkDelete(100, true);
+
+  
+  channel.send({embed: {
+    color: 0x550,
+    title: "Regeln:",
+    description: "Hier sind die Regeln:"
+  }})
+
+  channel.send({embed: {
+    color: 0x3498DB,
+    title: "Werde ein Helfer!",
+    description: "<@&859848403563577345>",
+    fields: [
+      {
+        name: "Was machen Helfer?",
+        value: ` \`\`\`- Helfer können Hausaufgaben hinzufügen \n- Sie können bei Hausafgaben helfen  \`\`\``
+      },
+      {
+        name: "Wie werde ich Helfer?",
+        value: "Reagiere einfach auf dieser nachricht mit dem 🇭 emoji. \n Klicke dazu einfach unten auf das 🇭 unter dieser Nachricht."
+      }
+    ]
+  }})
+  .then(function (message) {
+          message.react("🇭");
+          msgId = message.id;
+    		});
+
+
+}
+
+function send_botUpdates() {
+  channel = client.channels.cache.get(config.bot_channel);
+}
+
+
+client.on('voiceStateUpdate', (oldMember, newMember) => {
+  var data  = fs.readFileSync('./channels.json'),
+  json	= JSON.parse(data),
+  channels    = json.channels;
+  
+  var filter = channels.filter(function (el) {
+    return el != null;
+  });
+  channels = filter;
+      
+  if(channels.length >= 0) for(let i = 0; i < channels.length; i++) {
+    // Finding...
+    var ch = client.channels.cache.get(channels[i]);
+    if(ch.members.size <= 0){
+      ch.delete()
+      // Channel has been deleted!
+      delete channels[i];
+      var filter = channels.filter(function (el) {
+        return el != null;
+      });
+      channels = filter;
+      json.channels = channels;
+      fs.writeFileSync('./channels.json', JSON.stringify(json, null, 2));
+    
+    }
+  }
+
+
+  const mainCatagory = '858436736555810888';
+  const mainChannel = '860847697736892436';
+ 
+
+     if(newMember.channelID == mainChannel){
+        // Create channel...
+        var server = client.guilds.cache.get('858436736555810886');
+        var user = client.users.cache.find(user => user.id === newMember.member.id)
+         server.channels.create(`${user.username}'s channel`, {type: 'voice', parent: mainCatagory})
+             .then(async channel => {
+                 channels.push(channel.id);
+                 json.channels = channels;
+                 fs.writeFileSync('./channels.json', JSON.stringify(json, null, 2));
+
+                 newMember.member.voice.setChannel(channel);
+                 
+                });
+                
+              }             
+                            
+                
+              })
+
+
+
 
 client.login(config.token);

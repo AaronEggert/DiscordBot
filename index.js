@@ -571,18 +571,37 @@ function checkInTime () {
     channel = client.channels.cache.get('859735266948677672');
     channel.bulkDelete(100, true);
 
+  channel.send("Hausaufgaben werden geladen...");
+
+  var leftHomework = 0;
+
   for (let i = 0; i < hw.length; i++) {
     var item =  hw[i];
     var aTime   = new Date(item.Abgabe),
     now     = new Date(),
-    dif     = aTime.getTime() - now.getTime(),
-    oneDay  = 1000 * 60 * 60 * 24,
+    dif     = aTime.getTime() - now.getTime() - /* Ein monat */ 2628002880 - /* Ein Tag */ 86400000,
     oneHour = 1000 * 60 * 60,
     hoursLeft;
     
+            if (dif <= 0) {
+              var data  = fs.readFileSync('./homework.json'),
+              json	= JSON.parse(data),
+              hw    = json.HW;
+    
+              delete hw[i];
+    
+              var filter = hw.filter(function (el) {
+                return el != null;
+              });
+              json.HW = filter;
+    
+              console.log(`Delete Hw ${i}`);
+    
+              fs.writeFileSync('./homework.json', JSON.stringify(json, null, 2));
 
-
-    var date = new Date(item.Abgabe);
+              break;
+              
+            }
 
         var daysLeft = 0;
 
@@ -594,42 +613,36 @@ function checkInTime () {
           hoursLeft -= 24;
         }
 
+        //channel.send(hoursLeft);
+        //channel.send(daysLeft);
       //channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
         
-
-        if (daysLeft == 0 && hoursLeft <= 0) {
-          var data  = fs.readFileSync('./homework.json'),
-          json	= JSON.parse(data),
-          hw    = json.HW;
-
-          delete hw[i];
-
-          var filter = hw.filter(function (el) {
-            return el != null;
-          });
-          json.HW = filter;
-
-          console.log(`Delete Hw ${i}`);
-
-          fs.writeFileSync('./homework.json', JSON.stringify(json, null, 2));
-          
+        if ( daysLeft < 2) {
+          leftHomework++;
+          lastChance(channel, i, hoursLeft, daysLeft, aTime, item);
         }
-        if (daysLeft == 0 ) {
-          lastChance(channel, i);
+        else if (daysLeft == 0 && hoursLeft < 24)
+        {
+          leftHomework++;
+          lastChance(channel, i, hoursLeft, daysLeft, aTime, item);
+          
         }
 
   }
 
+    if (leftHomework == 0)
+    {
+      channel.send({embed: {
+        title: "",
+        description: "Es sind in den nächsten 2 Tagen keine Hausaufgeben zu erledigen!",
+        color: 0x2ECC71
+      }})
+    }
 }
 
-function lastChance (channel, num) {  
-  var data  = fs.readFileSync('./homework.json'),
-    json	= JSON.parse(data),
-    hw    = json.HW;
-    
-  var item =  hw[num];
- 
+function lastChance (channel, num, hoursLeft, daysLeft, aTime, item) {  
+  var date = new Date(aTime.getFullYear(), (aTime.getMonth() - 1), aTime.getDate(), aTime.getHours(), aTime.getMinutes());
   const COLORS = {
     red: 0xE74C3C,
     green: 0x2ECC71,
@@ -656,7 +669,7 @@ var color;
     color: color,
     
     title: "Achtung!!!",
-    description: "*Folgende Hausaufgabe Endet in weniger als 1 Tag.*",
+    description: "*Folgende Hausaufgabe Endet demnächst.*",
     fields: [{
         name: "Aufgabe:",
         value: item.Aufgabe,
@@ -667,16 +680,44 @@ var color;
       },
       {
         name: "Abgabe:",
-        value: `${item.Abgabe.getDate()}.${(item.Abgabe.getMonth() + 1)}.${item.Abgabe.getFullYear()} ${(item.Abgabe.getHours() + 2)}:${item.Abgabe.getMinutes()}`,
+        value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()} um ${date.getHours()}:${date.getMinutes()}. \n  Es sind noch ${daysLeft} Tag/e und ${hoursLeft} Stunde/n bis zur Abgabe!`,
       }
     ],
-    timestamp: "s",
+    timestamp: new Date(),
     footer: {
-      text: "Automatische Warnnachricht"
+      text: "@AaronBot"
     }
   }
   });
 }
+
+function GetDayOfWeek(x)
+{
+  switch(x)
+  {
+    case 1:
+      return "Montag";
+    
+    case 2:
+      return "Dienstag";
+
+    case 3: 
+      return "Mittwoch";
+
+    case 4:
+      return "Donnerstag";
+
+    case 5:
+      return "Freitag";
+
+    case 6:
+      return "Samstag";
+
+    case 7:
+      return "Sonntag";
+  }
+}
+
 
 function cmd_clear (msg, args, author) {
   var amount = parseInt(args[0]);

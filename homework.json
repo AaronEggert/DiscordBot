@@ -1,15 +1,21 @@
 {
  "HW": [
   {
-   "Fach": "mathe",
-   "Abgabe": "2021-08-06T13:30:00.000Z",
-   "Aufgabe": "mathe",
+   "Fach": "deutsch",
+   "Abgabe": "2021-09-06T10:50:00.000Z",
+   "Aufgabe": "Test1234",
+   "Ersteller": "<Aaron>"
+  },
+  {
+   "Fach": "englisch",
+   "Abgabe": "2021-09-08T11:45:00.000Z",
+   "Aufgabe": "Mach die Aufgabe auf Seite 113.",
    "Ersteller": "<Aaron>"
   },
   {
    "Fach": "mathe",
-   "Abgabe": "2021-08-06T13:30:00.000Z",
-   "Aufgabe": "ehcnr",
+   "Abgabe": "2021-09-07T09:44:00.000Z",
+   "Aufgabe": "Test2345rse",
    "Ersteller": "<Aaron>"
   }
  ]

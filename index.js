@@ -382,9 +382,24 @@ function cmd_homework (msg, args, author) {
 
 
 
-    var date = new Date(item.Abgabe);
-    date     = new Date(date.getFullYear(), (date.getMonth() - 1), date.getDate(), date.getHours(), date.getMinutes());
-  
+    var date = new Date(item.Abgabe),
+    date     = new Date(date.getFullYear(), (date.getMonth()), date.getDate(), date.getHours(), date.getMinutes()),
+    oneHour = 1000 * 60 * 60;
+    
+    var daysLeft = 0,
+    now     = new Date(),
+    dif     = date.getTime() - now.getTime()  - /*Ein monat */ 2628002880 - /* Ein Tag */ 86400000;
+
+    hoursLeft = dif / oneHour;
+
+    hoursLeft = Math.round(hoursLeft);
+
+    for (let i = 0; hoursLeft >= 24; daysLeft++) {
+      hoursLeft -= 24;
+    }
+
+    
+
     msg.channel.send({ embed: {
         color: color,
         
@@ -400,7 +415,7 @@ function cmd_homework (msg, args, author) {
           },
           {
             name: "Abgabe:",
-            value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()}`,
+            value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()} um ${date.getHours()}:${date.getMinutes()}.\nIn ${daysLeft} Tag/en und ${hoursLeft} Stunde/n.`,
           }
         ],
         timestamp: new Date(),
@@ -571,7 +586,11 @@ function checkInTime () {
     channel = client.channels.cache.get('859735266948677672');
     channel.bulkDelete(100, true);
 
-  channel.send("Hausaufgaben werden geladen...");
+  channel.send({embed: {
+    title: "*Folgende Hausaufgaben sind in den nächten Tage fällig:*",
+    description: "@everyone",
+    color: 0x8E44AD
+  }});
 
   var leftHomework = 0;
 
@@ -642,7 +661,7 @@ function checkInTime () {
 }
 
 function lastChance (channel, num, hoursLeft, daysLeft, aTime, item) {  
-  var date = new Date(aTime.getFullYear(), (aTime.getMonth() - 1), aTime.getDate(), aTime.getHours(), aTime.getMinutes());
+  var date = new Date(aTime.getFullYear(), (aTime.getMonth()), aTime.getDate(), aTime.getHours(), aTime.getMinutes());
   const COLORS = {
     red: 0xE74C3C,
     green: 0x2ECC71,
@@ -668,8 +687,8 @@ var color;
   channel.send({ embed: {
     color: color,
     
-    title: "Achtung!!!",
-    description: "*Folgende Hausaufgabe Endet demnächst.*",
+    title: "",
+    description: "",
     fields: [{
         name: "Aufgabe:",
         value: item.Aufgabe,

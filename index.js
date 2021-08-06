@@ -586,9 +586,10 @@ function checkInTime () {
     channel = client.channels.cache.get('859735266948677672');
     channel.bulkDelete(100, true);
 
+  channel.send("@everyone");
   channel.send({embed: {
     title: "*Folgende Hausaufgaben sind in den nächten Tagen fällig:*",
-    description: "@everyone",
+    description: "",
     color: 0x8E44AD
   }});
 
@@ -704,7 +705,8 @@ var color;
     ],
     timestamp: new Date(),
     footer: {
-      text: "@AaronBot"
+      text: "@AaronBot",
+
     }
   }
   });
@@ -942,6 +944,7 @@ client.on('message', msg => {
 
     }
      if (msg.mentions.has(client.user)) {
+      if (msg.content.includes("@here") || msg.content.includes("@everyone")) return false;
        msg.reply(`Der Bot prefix ist: \`${config.prefix}\`. `);
    }
 });

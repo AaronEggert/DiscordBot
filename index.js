@@ -233,9 +233,8 @@ function cmd_help (msg, args, author) {
 function cmd_homework (msg, args, author) {
   if (args[0] === "add") {
 
-    msg.reply("Zu wann soll die Hausaufgabe erledigt sein?")
-    msg.channel.send("Die Zeit muss in folgendem Format gesendet werden:")
-    msg.channel.send("<Jahr> <Monat> <Tag> <Stunde> <Minute>")
+    msg.reply("Zu wann soll die Hausaufgabe erledigt sein?\nDie Zeit muss in folgendem Format gesendet werden:\n<Jahr> <Monat> <Tag> <Stunde> <Minute>")
+
     
 
     //
@@ -306,7 +305,7 @@ function cmd_homework (msg, args, author) {
           //  Fragt das Fach ab
           //
           msg.reply("Welches Fach?");
-          msg.channel.send("< Mathe | Deutsch | Englisch>")
+          msg.channel.send("< Mathe | Deutsch | Englisch | Physik | Chenmie | Geschichte | Musik | LBAuB | Religion>")
         
           const filter = (newMessage) => {
             return newMessage.author.id === msg.author.id
@@ -326,7 +325,7 @@ function cmd_homework (msg, args, author) {
       
             fach = collectedFach.toString().toLowerCase();
           
-            if (fach == "mathe" || fach == "deutsch" || fach == "englisch") {
+            if (fach == "mathe" || fach == "deutsch" || fach == "englisch" || fach == "physik" || fach == "chemie" || fach == "geschichte" || fach == "musik" || fach == "lbaub" || fach == "religion") {
 
             }
             else {
@@ -423,23 +422,49 @@ function cmd_homework (msg, args, author) {
       //Embeds.hwList(client, color, msg.channel, item.Aufgabe, `Aufgabe: ${i}`, "", "Fach: ", item.Fach, "Hinzugefügt von: ", item.Ersteller, "Abgabe: ", new Date(item.Abgabe));
 
       const COLORS = {
-        red: 0xE74C3C,
+        deutsch: 0xE74C3C,
+        englisch: 0xE67E22,
+        mathe: 0x3498DB,
+        physik: 0x32CD32,
+        chemie: 0x008000,
+        geschichte: 0x825A2C,
+        musik: 0xAA00FF,
+        lbaub: 0x34495E,
+        religion: 0xF1C40F,
         green: 0x2ECC71,
-        orange: 0xE67E22,
-        blue: 0x3498DB,
         dark_gray: 0x34495E
     }
     var color;
+
+     //  Mathe | Deutsch | Englisch | Physik | Chenmie | Geschichte | Musik | LBAuB | reli
+
       switch (item.Fach) {
         case "mathe":
-          color = COLORS.blue;
+          color = COLORS.mathe;
           break;
         case "deutsch":
-          color = COLORS.red;
+          color = COLORS.deutsch;
           break;
         case "englisch":
-          color = COLORS.orange;
+          color = COLORS.englisch;
           break;
+        case "physik":
+          color = COLORS.physik;
+          break;
+        case "chemie":
+          color = COLORS.chemie;
+          break;
+        case "geschichte":
+          color = COLORS.geschichte;
+          break;
+        case "musik":
+          color = COLORS.musik;
+          break;
+        case "lbaub":
+          color = COLORS.lbaub;
+          break;
+        case "religion":
+          color = COLORS.religion
         
       }
 
@@ -728,25 +753,51 @@ function checkInTime () {
 function lastChance (channel, num, hoursLeft, daysLeft, aTime, item) {  
   var date = new Date(aTime.getFullYear(), (aTime.getMonth()), aTime.getDate(), aTime.getHours(), aTime.getMinutes());
   const COLORS = {
-    red: 0xE74C3C,
+    deutsch: 0xE74C3C,
+    englisch: 0xE67E22,
+    mathe: 0x3498DB,
+    physik: 0x32CD32,
+    chemie: 0x008000,
+    geschichte: 0x825A2C,
+    musik: 0xAA00FF,
+    lbaub: 0x34495E,
+    religion: 0xF1C40F,
     green: 0x2ECC71,
-    orange: 0xE67E22,
-    blue: 0x3498DB,
     dark_gray: 0x34495E
 }
 var color;
+
+
   switch (item.Fach) {
     case "mathe":
-      color = COLORS.blue;
+      color = COLORS.mathe;
       break;
     case "deutsch":
-      color = COLORS.red;
+      color = COLORS.deutsch;
       break;
     case "englisch":
-      color = COLORS.orange;
+      color = COLORS.englisch;
       break;
+    case "physik":
+      color = COLORS.physik;
+      break;
+    case "chemie":
+      color = COLORS.chemie;
+      break;
+    case "geschichte":
+      color = COLORS.geschichte;
+      break;
+    case "musik":
+      color = COLORS.musik;
+      break;
+    case "lbaub":
+      color = COLORS.lbaub;
+      break;
+    case "religion":
+      color = COLORS.religion
     
   }
+
 
 
   channel.send({ embed: {

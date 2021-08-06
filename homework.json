@@ -1,16 +1,10 @@
-
- "HW": [
-  {
-   "Fach": "englisch",
-   "Abgabe": "2021-09-08T11:45:00.000Z",
-   "Aufgabe": "Mach die Aufgabe aufaecve Seite 113.",
-   "Ersteller": "<Aaron>"
-  },
-  {
-   "Fach": "mathe",
-   "Abgabe": "2021-09-07T09:44:00.000Z",
-   "Aufgabe": "Test2345rse",
-   "Ersteller": "<Aaron>"
-  }
- ]
+{
+    "HW": [
+        {
+            "Fach": "musik",
+            "Abgabe": "2021-09-07T10:50:00.000Z",
+            "Aufgabe": "test_musik",
+            "Ersteller": "<Aaron>"
+        }
+    ]
 }

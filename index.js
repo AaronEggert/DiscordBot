@@ -16,6 +16,7 @@ var msgId;
 
   var cmdmap = {
     help: cmd_help,
+    h: cmd_help,
     say: cmd_say,
     test: cmd_test,
     set: cmd_set,
@@ -35,14 +36,76 @@ function cmd_help (msg, args, author) {
     color: 0x2ECC71,
     
     title: "Hilfe ist unterwegs!",
-    description: "Hier ist eine Liste aller Kategorien. \n Für eine detalirerte Befehlsliste gebe einfach nach dem \'Help\' Befehl noch die Kategorie an. \n !help <Kategorie> \n *Beispiel: *  !help homework",
+    description: "",
     fields: [{
-        name: "homework (Abkürzung: 'hw')",
-        value: "Mit dem Befehl kannst du ganz einfach Hausaufgaben hinzufügen und Abrufen.",
+      name: "!ping",
+      value: "pingt den Bot und gibt die Latenz zurück",
+      inline: false
       },
       {
-        name: "say",
-        value: "Sendet eine Nachricht in einen Bestimmten Channel."
+        name: '\u200b',
+        value: '\u200b',
+        inline: false,
+      },
+      {
+        name: "clear",
+        value: "```!clear (anzahl der Nachrichten die gelöscht werden sollen)``` \nLöscht die anzahl der Nachrichten",
+        inline: false
+      },
+      {
+        name: "\u200b",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "homework / hw",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "add",
+        value: "```!hw add```\nHausaufgabe hinzufügen",
+        inline: true,
+      },
+      {
+        name: "list",
+        value: "```!hw list```\nListet alle Hausaufgaben auf",
+        inline: true,
+      },
+      {
+        name: "delete (Administrator only)",
+        value: "```!hw delete [ all | (nummer der Hausaufgabe)]```\nLöscht alle oder die jeweilige Hausaufgabe",
+        inline: true,
+      },
+      {
+        name: "in-time",
+        value: "Startet manuell die Überprüfung ob Hausaufgaben abgelaufen sind\nAutomatisch alle 5h",
+        inline: true,
+      },
+      {
+        name: "\u200b",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "ignore (Administrator only)",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "add",
+        value: "```!hw add (channel)```\nFügt einen Kannal hinzu der von dem Bot ignoriert werden soll",
+        inline: true,
+      },
+      {
+        name: "list",
+        value: "```!hw list```\nListet alle Kanäle auf die vom Bot ignoriert werden",
+        inline: true,
+      },
+      {
+        name: "remove",
+        value: "```!hw remove (channel)```\nLöscht den Kanal von der Liste der Kanäle die vom Bot ignoriert werden",
+        inline: true,
       }
     ],
     timestamp: new Date(),

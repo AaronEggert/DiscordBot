@@ -33,7 +33,7 @@ var msgId;
 
 function cmd_help (msg, args, author) {
   msg.channel.send({ embed: {
-    color: 0x2ECC71,
+    color: /*0x2ECC71*/0x34495E,
     
     title: "Hilfe ist unterwegs!",
     description: "",

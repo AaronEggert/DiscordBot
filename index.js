@@ -16,6 +16,7 @@ var msgId;
 
   var cmdmap = {
     help: cmd_help,
+    h: cmd_help,
     say: cmd_say,
     test: cmd_test,
     set: cmd_set,
@@ -32,17 +33,79 @@ var msgId;
 
 function cmd_help (msg, args, author) {
   msg.channel.send({ embed: {
-    color: 0x2ECC71,
+    color: /*0x2ECC71*/0x34495E,
     
     title: "Hilfe ist unterwegs!",
-    description: "Hier ist eine Liste aller Kategorien. \n Für eine detalirerte Befehlsliste gebe einfach nach dem \'Help\' Befehl noch die Kategorie an. \n !help <Kategorie> \n *Beispiel: *  !help homework",
+    description: "",
     fields: [{
-        name: "homework (Abkürzung: 'hw')",
-        value: "Mit dem Befehl kannst du ganz einfach Hausaufgaben hinzufügen und Abrufen.",
+      name: "!ping",
+      value: "pingt den Bot und gibt die Latenz zurück",
+      inline: false
       },
       {
-        name: "say",
-        value: "Sendet eine Nachricht in einen Bestimmten Channel."
+        name: '\u200b',
+        value: '\u200b',
+        inline: false,
+      },
+      {
+        name: "clear",
+        value: "```!clear (anzahl der Nachrichten die gelöscht werden sollen)``` \nLöscht die anzahl der Nachrichten",
+        inline: false
+      },
+      {
+        name: "\u200b",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "homework / hw",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "add",
+        value: "```!hw add```\nHausaufgabe hinzufügen",
+        inline: true,
+      },
+      {
+        name: "list",
+        value: "```!hw list```\nListet alle Hausaufgaben auf",
+        inline: true,
+      },
+      {
+        name: "delete (Administrator only)",
+        value: "```!hw delete [ all | (nummer der Hausaufgabe)]```\nLöscht alle oder die jeweilige Hausaufgabe",
+        inline: true,
+      },
+      {
+        name: "in-time",
+        value: "Startet manuell die Überprüfung ob Hausaufgaben abgelaufen sind\nAutomatisch alle 5h",
+        inline: true,
+      },
+      {
+        name: "\u200b",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "ignore (Administrator only)",
+        value: "\u200b",
+        inline: false,
+      },
+      {
+        name: "add",
+        value: "```!hw add (channel)```\nFügt einen Kannal hinzu der von dem Bot ignoriert werden soll",
+        inline: true,
+      },
+      {
+        name: "list",
+        value: "```!hw list```\nListet alle Kanäle auf die vom Bot ignoriert werden",
+        inline: true,
+      },
+      {
+        name: "remove",
+        value: "```!hw remove (channel)```\nLöscht den Kanal von der Liste der Kanäle die vom Bot ignoriert werden",
+        inline: true,
       }
     ],
     timestamp: new Date(),
@@ -382,30 +445,46 @@ function cmd_homework (msg, args, author) {
 
 
 
-    var date = new Date(item.Abgabe);
-  
+
+    var date = new Date(item.Abgabe),
+    date     = new Date(date.getFullYear(), (date.getMonth()), date.getDate(), date.getHours(), date.getMinutes()),
+    oneHour = 1000 * 60 * 60;
+    
+    var daysLeft = 0,
+    now     = new Date(),
+    dif     = date.getTime() - now.getTime()  - /*Ein monat */ 2628002880 - /* Ein Tag */ 86400000;
+
+    hoursLeft = dif / oneHour;
+
+    hoursLeft = Math.round(hoursLeft);
+
+    for (let i = 0; hoursLeft >= 24; daysLeft++) {
+      hoursLeft -= 24;
+    }
+
 
     msg.channel.send({ embed: {
         color: color,
         
-        title: `Aufgabe ${i}`,
+        title: ``,
         description: "",
         fields: [{
             name: "Aufgabe:",
             value: item.Aufgabe,
           },
           {
-            name: "Fach: ",
+            name: "Fach:",
             value: item.Fach,
           },
           {
             name: "Abgabe:",
-            value: `${date.getDate()}.${(date.getMonth())}.${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
+            value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()} um ${date.getHours()}:${date.getMinutes()}.\nIn ${daysLeft} Tag/en und ${hoursLeft} Stunde/n.`,
+
           }
         ],
-        timestamp: "",
+        timestamp: new Date(),
         footer: {
-          text: ""
+          text: "@AaronBot"
         }
       }
     });
@@ -571,18 +650,42 @@ function checkInTime () {
     channel = client.channels.cache.get('859735266948677672');
     channel.bulkDelete(100, true);
 
+  channel.send("@everyone");
+  channel.send({embed: {
+    title: "*Folgende Hausaufgaben sind in den nächten Tagen fällig:*",
+    description: "",
+    color: 0x8E44AD
+  }});
+
+  var leftHomework = 0;
+
   for (let i = 0; i < hw.length; i++) {
     var item =  hw[i];
     var aTime   = new Date(item.Abgabe),
     now     = new Date(),
-    dif     = aTime.getTime() - now.getTime(),
-    oneDay  = 1000 * 60 * 60 * 24,
+    dif     = aTime.getTime() - now.getTime() - /* Ein monat */ 2628002880 - /* Ein Tag */ 86400000,
     oneHour = 1000 * 60 * 60,
     hoursLeft;
     
+            if (dif <= 0) {
+              var data  = fs.readFileSync('./homework.json'),
+              json	= JSON.parse(data),
+              hw    = json.HW;
+    
+              delete hw[i];
+    
+              var filter = hw.filter(function (el) {
+                return el != null;
+              });
+              json.HW = filter;
+    
+              console.log(`Delete Hw ${i}`);
+    
+              fs.writeFileSync('./homework.json', JSON.stringify(json, null, 2));
 
-
-    var date = new Date(item.Abgabe);
+              break;
+              
+            }
 
         var daysLeft = 0;
 
@@ -594,42 +697,36 @@ function checkInTime () {
           hoursLeft -= 24;
         }
 
+        //channel.send(hoursLeft);
+        //channel.send(daysLeft);
       //channel.send(`${daysLeft} : Days left \n ${hoursLeft} : Hours left`);
         
         
-
-        if (daysLeft == 0 && hoursLeft <= 0) {
-          var data  = fs.readFileSync('./homework.json'),
-          json	= JSON.parse(data),
-          hw    = json.HW;
-
-          delete hw[i];
-
-          var filter = hw.filter(function (el) {
-            return el != null;
-          });
-          json.HW = filter;
-
-          console.log(`Delete Hw ${i}`);
-
-          fs.writeFileSync('./homework.json', JSON.stringify(json, null, 2));
-          
+        if ( daysLeft < 2) {
+          leftHomework++;
+          lastChance(channel, i, hoursLeft, daysLeft, aTime, item);
         }
-        if (daysLeft == 0 ) {
-          lastChance(channel, i);
+        else if (daysLeft == 0 && hoursLeft < 24)
+        {
+          leftHomework++;
+          lastChance(channel, i, hoursLeft, daysLeft, aTime, item);
+          
         }
 
   }
 
+    if (leftHomework == 0)
+    {
+      channel.send({embed: {
+        title: "",
+        description: "Es sind in den nächsten 2 Tagen keine Hausaufgeben zu erledigen!",
+        color: 0x2ECC71
+      }})
+    }
 }
 
-function lastChance (channel, num) {  
-  var data  = fs.readFileSync('./homework.json'),
-    json	= JSON.parse(data),
-    hw    = json.HW;
-    
-  var item =  hw[num];
- 
+function lastChance (channel, num, hoursLeft, daysLeft, aTime, item) {  
+  var date = new Date(aTime.getFullYear(), (aTime.getMonth()), aTime.getDate(), aTime.getHours(), aTime.getMinutes());
   const COLORS = {
     red: 0xE74C3C,
     green: 0x2ECC71,
@@ -655,8 +752,8 @@ var color;
   channel.send({ embed: {
     color: color,
     
-    title: "Achtung!!!",
-    description: "*Folgende Hausaufgabe Endet in weniger als 1 Tag.*",
+    title: "",
+    description: "",
     fields: [{
         name: "Aufgabe:",
         value: item.Aufgabe,
@@ -667,16 +764,45 @@ var color;
       },
       {
         name: "Abgabe:",
-        value: `${item.Abgabe.getDate()}.${(item.Abgabe.getMonth() + 1)}.${item.Abgabe.getFullYear()} ${(item.Abgabe.getHours() + 2)}:${item.Abgabe.getMinutes()}`,
+        value: `Am ${GetDayOfWeek(date.getDay())} den ${date.getDate()}.${date.getMonth()} ${date.getFullYear()} um ${date.getHours()}:${date.getMinutes()}. \n  Es sind noch ${daysLeft} Tag/e und ${hoursLeft} Stunde/n bis zur Abgabe!`,
       }
     ],
-    timestamp: "s",
+    timestamp: new Date(),
     footer: {
-      text: "Automatische Warnnachricht"
+      text: "@AaronBot",
+
     }
   }
   });
 }
+
+function GetDayOfWeek(x)
+{
+  switch(x)
+  {
+    case 1:
+      return "Montag";
+    
+    case 2:
+      return "Dienstag";
+
+    case 3: 
+      return "Mittwoch";
+
+    case 4:
+      return "Donnerstag";
+
+    case 5:
+      return "Freitag";
+
+    case 6:
+      return "Samstag";
+
+    case 7, 0:
+      return "Sonntag";
+  }
+}
+
 
 function cmd_clear (msg, args, author) {
   var amount = parseInt(args[0]);
@@ -830,7 +956,7 @@ client.on('ready', () => {
 //
 
 /// Every 4 hours
-cron.schedule('00 0-23/4 * * *', function() {
+cron.schedule('00 */5 * * *', function() {
   checkInTime();
 });
 
@@ -882,6 +1008,7 @@ client.on('message', msg => {
 
     }
      if (msg.mentions.has(client.user)) {
+      if (msg.content.includes("@here") || msg.content.includes("@everyone")) return false;
        msg.reply(`Der Bot prefix ist: \`${config.prefix}\`. `);
    }
 });

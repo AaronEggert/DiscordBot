@@ -587,7 +587,7 @@ function checkInTime () {
     channel.bulkDelete(100, true);
 
   channel.send({embed: {
-    title: "*Folgende Hausaufgaben sind in den nächten Tage fällig:*",
+    title: "*Folgende Hausaufgaben sind in den nächten Tagen fällig:*",
     description: "@everyone",
     color: 0x8E44AD
   }});
